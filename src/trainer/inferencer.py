@@ -1,5 +1,6 @@
 import torch
 from tqdm.auto import tqdm
+from pathlib import Path
 
 from src.metrics.tracker import MetricTracker
 from src.trainer.base_trainer import BaseTrainer
@@ -136,26 +137,26 @@ class Inferencer(BaseTrainer):
         # Some saving logic. This is an example
         # Use if you need to save predictions on disk
 
-        batch_size = batch["logits"].shape[0]
-        current_id = batch_idx * batch_size
+        batch_size = batch["log_probs"].shape[0]
 
         for i in range(batch_size):
-            # clone because of
-            # https://github.com/pytorch/pytorch/issues/1995
-            logits = batch["logits"][i].clone()
-            label = batch["labels"][i].clone()
-            pred_label = logits.argmax(dim=-1)
+            length = batch["log_probs_length"][i].clone()
+            log_probs = batch["log_probs"][i].clone()
+            log_probs_np = log_probs[:length].detach().cpu().numpy()
 
-            output_id = current_id + i
+            text_predicted = self.text_encoder.ctc_beam_search_decode(log_probs_np)
 
-            output = {
-                "pred_label": pred_label,
-                "label": label,
-            }
+            wav_path = batch["audio_path"][i]
+            wav_filename = Path(wav_path).stem 
 
             if self.save_path is not None:
-                # you can use safetensors or other lib here
-                torch.save(output, self.save_path / part / f"output_{output_id}.pth")
+                save_dir = self.save_path / part
+                save_dir.mkdir(parents=True, exist_ok=True)
+
+                output_file = save_dir / f"{wav_filename}.txt"
+
+                with open(output_file, "w", encoding="utf-8") as f:
+                    f.write(text_predicted)
 
         return batch
 

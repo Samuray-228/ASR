@@ -26,7 +26,7 @@ class LibrispeechDataset(BaseDataset):
         assert part in URL_LINKS or part == "train_all"
 
         if data_dir is None:
-            data_dir = ROOT_PATH / "data" / "datasets" / "librispeech"
+            data_dir = Path("/kaggle/working/librispeech_data")
             data_dir.mkdir(exist_ok=True, parents=True)
         self._data_dir = data_dir
         if part == "train_all":
@@ -43,16 +43,6 @@ class LibrispeechDataset(BaseDataset):
 
         super().__init__(index, *args, **kwargs)
 
-    def _load_part(self, part):
-        arch_path = self._data_dir / f"{part}.tar.gz"
-        print(f"Loading part {part}")
-        wget.download(URL_LINKS[part], str(arch_path))
-        shutil.unpack_archive(arch_path, self._data_dir)
-        for fpath in (self._data_dir / "LibriSpeech").iterdir():
-            shutil.move(str(fpath), str(self._data_dir / fpath.name))
-        os.remove(str(arch_path))
-        shutil.rmtree(str(self._data_dir / "LibriSpeech"))
-
     def _get_or_load_index(self, part):
         index_path = self._data_dir / f"{part}_index.json"
         if index_path.exists():
@@ -67,6 +57,13 @@ class LibrispeechDataset(BaseDataset):
     def _create_index(self, part):
         index = []
         split_dir = self._data_dir / part
+        
+        input_dir = Path("/kaggle/input/librispeech")
+        if input_dir.exists() and not split_dir.exists():
+            target_dir = input_dir / part
+            if target_dir.exists():
+                split_dir.symlink_to(target_dir)
+        
         if not split_dir.exists():
             self._load_part(part)
 

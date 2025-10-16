@@ -29,6 +29,8 @@ class BaseTrainer:
         logger,
         writer,
         epoch_len=None,
+        beam_search=False,
+        beam_size=3,
         skip_oom=True,
         batch_transforms=None,
     ):
@@ -74,6 +76,9 @@ class BaseTrainer:
         self.lr_scheduler = lr_scheduler
         self.text_encoder = text_encoder
         self.batch_transforms = batch_transforms
+
+        self.beam_search = beam_search
+        self.beam_size = beam_size
 
         # define dataloaders
         self.train_dataloader = dataloaders["train"]

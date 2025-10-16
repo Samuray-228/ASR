@@ -176,9 +176,27 @@ class CometMLWriter:
             image (Path | Tensor | ndarray | list[tuple] | Image): image
                 in the CometML-friendly format.
         """
-        self.exp.log_image(
-            image_data=image, name=self._object_name(image_name), step=self.step
-        )
+        try:
+            if hasattr(image, 'detach'):
+                image = image.detach().cpu().numpy()
+            
+            if isinstance(image, np.ndarray) and image.ndim == 3:
+                if image.shape[0] in [1, 3, 4]: 
+                    image = image.transpose(1, 2, 0)
+                
+                if image.ndim == 3 and image.shape[-1] == 1:
+                    image = np.repeat(image, 3, axis=-1)
+                
+                if image.dtype == np.float32 or image.dtype == np.float64:
+                    image = (image * 255).astype(np.uint8)
+            
+            self.exp.log_image(
+                image_data=image, name=self._object_name(image_name), step=self.step
+            )
+        except Exception as e:
+            print(f"Warning: Could not log image {image_name}: {e}")
+            if hasattr(image, 'shape'):
+                print(f"Image shape: {image.shape}, dtype: {getattr(image, 'dtype', 'unknown')}")
 
     def add_audio(self, audio_name, audio, sample_rate=None):
         """

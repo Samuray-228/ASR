@@ -1,3 +1,4 @@
+import os
 import warnings
 
 import hydra
@@ -10,6 +11,8 @@ from src.trainer import Trainer
 from src.utils.init_utils import set_random_seed, setup_saving_and_logging
 
 warnings.filterwarnings("ignore", category=UserWarning)
+
+os.environ["HYDRA_FULL_ERROR"] = "1"
 
 
 @hydra.main(version_base=None, config_path="src/configs", config_name="baseline")
@@ -63,6 +66,8 @@ def main(config):
     # epoch_len = number of iterations for iteration-based training
     # epoch_len = None or len(dataloader) for epoch-based training
     epoch_len = config.trainer.get("epoch_len")
+    beam_search = config.trainer.get("beam_search")
+    beam_size = config.trainer.get("beam_size")
 
     trainer = Trainer(
         model=model,
@@ -75,6 +80,8 @@ def main(config):
         device=device,
         dataloaders=dataloaders,
         epoch_len=epoch_len,
+        beam_search=beam_search,
+        beam_size=beam_size,
         logger=logger,
         writer=writer,
         batch_transforms=batch_transforms,
