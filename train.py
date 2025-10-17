@@ -14,6 +14,8 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
 
+import gdown
+
 
 @hydra.main(version_base=None, config_path="src/configs", config_name="baseline")
 def main(config):
@@ -44,7 +46,15 @@ def main(config):
     dataloaders, batch_transforms = get_dataloaders(config, text_encoder, device)
 
     # build model architecture, then print to console
+    # model = instantiate(config.model, n_tokens=len(text_encoder)).to(device)
     model = instantiate(config.model, n_tokens=len(text_encoder)).to(device)
+    gdown.download("https://drive.google.com/file/d/1WzXbErURkPyrXzHBoOrxs8bljrvNyMRD/view?usp=share_link", 'saved0/testing/model.pth', quiet=False)
+    checkpoint = torch.load('saved0/testing/model.pth', map_location=device)
+    if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
+        model.load_state_dict(checkpoint['state_dict'])
+    else:
+        model.load_state_dict(checkpoint)
+    model.to(device)
     logger.info(model)
 
     # get function handles of loss and metrics

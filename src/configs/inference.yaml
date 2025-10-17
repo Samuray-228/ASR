@@ -1,12 +1,14 @@
 defaults:
   - model: deepspeech2
-  - metrics: example
+  - metrics: beam_argmax
   - datasets: inference # we do not want to run inference on training data
   - dataloader: example
   - transforms: example_only_instance
   - _self_
 text_encoder:
   _target_: src.text_encoder.CTCTextEncoder
+  vocab_path: src/lm/librispeech-vocab.txt
+  lm_path: src/lm/3-gram.pruned.1e-7.arpa
   beam_search: True
 inferencer:
   device_tensors: ["spectrogram", "text_encoded"] # which tensors should be on device (ex. GPU)
