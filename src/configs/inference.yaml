@@ -1,7 +1,7 @@
 defaults:
   - model: deepspeech2
   - metrics: beam_argmax
-  - datasets: test # we do not want to run inference on training data
+  - datasets: inference_test # we do not want to run inference on training data
   - dataloader: example
   - transforms: example_only_instance
   - _self_
