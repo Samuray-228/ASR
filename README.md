@@ -77,3 +77,7 @@ This repository is based on a [PyTorch Project Template](https://github.com/Blin
 ## License
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+
+### Demo
+
+Just run notebook `demo.ipynb` and it will do fine.
