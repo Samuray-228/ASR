@@ -48,7 +48,8 @@ def main(config):
     # build model architecture, then print to console
     # model = instantiate(config.model, n_tokens=len(text_encoder)).to(device)
     model = instantiate(config.model, n_tokens=len(text_encoder))
-    os.mkdir('/saved0/testing/')
+    os.mkdir('/saved0')
+    os.mkdir('/saved0/testing')
     gdown.download("https://drive.google.com/uc?id=1WzXbErURkPyrXzHBoOrxs8bljrvNyMRD&export=download", '/saved0/testing/model.pth', quiet=False)
     checkpoint = torch.load('saved0/testing/model.pth', map_location=device)
     if isinstance(checkpoint, dict) and 'state_dict' in checkpoint:
