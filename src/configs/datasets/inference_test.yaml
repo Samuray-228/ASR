@@ -3,4 +3,3 @@ test:
   audio_dir: null
   transcription_dir: null
   instance_transforms: ${transforms.instance_transforms.inference}
-  log_scale: True
