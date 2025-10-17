@@ -1,7 +1,7 @@
 defaults:
   - model: deepspeech2
   - metrics: beam_argmax
-  - datasets: inference # we do not want to run inference on training data
+  - datasets: test # we do not want to run inference on training data
   - dataloader: example
   - transforms: example_only_instance
   - _self_
@@ -17,4 +17,4 @@ inferencer:
   seed: 1
   beam_search: True
   beam_size: 5
-  from_pretrained: "saved/testing/model_best.pth" # path to the pretrained model
+  from_pretrained: "src/model_weights/model_best.pth" # path to the pretrained model
